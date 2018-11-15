@@ -21,7 +21,8 @@
         "onCommand:highlightwords.addRegExpHighlight",
         "onCommand:highlightwords.addHighlightWithOptions",
         "onCommand:highlightwords.removeAllHighlights",
-        "onCommand:highlightwords.setHighlightMode"
+        "onCommand:highlightwords.setHighlightMode",
+        "onCommand:highlightwords.addHighlightDifficult"
     ],
     "main": "./out/src/extension",
     "scripts": {
@@ -62,6 +63,10 @@
             {
                 "command": "highlightwords.setHighlightMode",
                 "title": "Set Highlight Mode"
+            },
+            {
+                "command": "highlightwords.addHighlightDifficult",
+                "title": "Highlight Difficult Lines"
             }
         ],
         "configuration": {
@@ -113,5 +118,10 @@
                 }
             }
         }
+    },
+    "dependencies": {
+        "file-system": "^2.2.2",
+        "fs": "0.0.1-security",
+        "require": "^2.4.20"
     }
 }

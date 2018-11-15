@@ -1,5 +1,6 @@
 'use strict';
 import { commands, ExtensionContext, window, OverviewRulerLane, workspace, Range, QuickPickItem, ThemableDecorationRenderOptions } from 'vscode';
+import fs = require('file-system')
 
 export function activate(context: ExtensionContext) {
     interface Highlightable {
@@ -43,6 +44,35 @@ export function activate(context: ExtensionContext) {
                 }
             });
     });
+
+    commands.registerCommand('highlightwords.addHighlightDifficult', function(){
+        //TODO: write this part
+        addLine(1)
+        addLine(10)
+    })
+
+    function addLine(line: number) {
+        const editor = window.activeTextEditor;
+        let l = editor.document.lineAt(line)
+        let word = editor.document.getText(l.range);
+        if(!word) {
+            const range = editor.document.getWordRangeAtPosition(editor.selection.start)
+            if(range) word = editor.document.getText(range)
+        }
+        if (!word) {
+            window.showInformationMessage('Nothing selected!')
+            return;
+        }
+        word = word.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") // raw selected text, not regexp
+        const highlights = words.filter(w => w.expression == word) // avoid duplicates
+        if (!highlights || !highlights.length) {
+            const ww = mode == Modes.WholeWord || mode == Modes.Both
+            const ic = mode == Modes.IgnoreCase || mode == Modes.Both
+            
+            words.push({ expression: word, wholeWord: ww, ignoreCase: ic });
+            updateDecorations()
+        }
+    }
 
     function addSelected(withOptions?: boolean) {
         const editor = window.activeTextEditor;
@@ -143,9 +173,9 @@ export function activate(context: ExtensionContext) {
         colors.forEach(function (color) {
             var dark: ThemableDecorationRenderOptions = {
                 // this color will be used in dark color themes
-                overviewRulerColor: color.dark,
+                overviewRulerColor: 'red',
                 backgroundColor: config.get<BoxOptions>('box').dark ? 'inherit' : color.dark,
-                borderColor: color.dark
+                borderColor: 'red'
             }
             if(!config.get<BoxOptions>('box').dark) 
                 dark.color = '#555555'
@@ -155,8 +185,8 @@ export function activate(context: ExtensionContext) {
                 overviewRulerLane: OverviewRulerLane.Right,
                 light: {
                     // this color will be used in light color themes
-                    overviewRulerColor: color.light,
-                    borderColor: color.light,
+                    overviewRulerColor: 'red',
+                    borderColor: 'red',
                     backgroundColor: config.get<BoxOptions>('box').light ? 'inherit' : color.light
                 },
                 dark: dark
