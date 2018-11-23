@@ -1,16 +1,17 @@
 {
-    "name": "highlight-words",
-    "displayName": "highlight-words",
-    "description": "Highlight all occurrences of words or expressions",
-    "version": "0.0.8",
+    "name": "blocklight",
+    "displayName": "blocklight",
+    "description": "Highlight your code as visual blocks",
+    "version": "0.0.1",
     "icon": "images/highlight.png",
-    "publisher": "rsbondi",
+    "publisher": "j2l",
+    "authors":"rsbondi,pmanzano"
     "engines": {
         "vscode": "^1.10.0"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/rsbondi/highlight-words"
+        "url": "https://github.com/j2l/blocklight"
     },
     "categories": [
         "Other"
@@ -32,11 +33,11 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0",
-        "mocha": "^2.3.3",
+        "@types/mocha": "^2.2.32",
         "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
+        "mocha": "^5.2.0",
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0"
     },
     "contributes": {
         "commands": [
