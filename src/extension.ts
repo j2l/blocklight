@@ -174,8 +174,9 @@ export function activate(context: ExtensionContext) {
             var dark: ThemableDecorationRenderOptions = {
                 // this color will be used in dark color themes
                 overviewRulerColor: 'red',
-                backgroundColor: config.get<BoxOptions>('box').dark ? 'inherit' : color.dark,
-                borderColor: 'red'
+                backgroundColor: color.dark, //config.get<BoxOptions>('box').dark ? 'inherit' : color.dark,
+                borderColor: color.dark,
+                color: 'black'
             }
             if(!config.get<BoxOptions>('box').dark) 
                 dark.color = '#555555'
@@ -186,8 +187,9 @@ export function activate(context: ExtensionContext) {
                 light: {
                     // this color will be used in light color themes
                     overviewRulerColor: 'red',
-                    borderColor: 'red',
-                    backgroundColor: config.get<BoxOptions>('box').light ? 'inherit' : color.light
+                    borderColor: color.light,
+                    backgroundColor: color.light, //config.get<BoxOptions>('box').light ? 'inherit' : color.light
+                    color: 'black'
                 },
                 dark: dark
             });

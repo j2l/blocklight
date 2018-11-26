@@ -54,7 +54,7 @@
             },
             {
                 "command": "highlightwords.addRegExpHighlight",
-                "title": "Highlight Expression"
+                "title": "Highlight Regex"
             },
             {
                 "command": "highlightwords.addHighlightWithOptions",
@@ -75,15 +75,15 @@
                     "default": [
                         {
                             "light": "#b3d9ff",
-                            "dark": "cyan"
+                            "dark": "red"
                         },
                         {
                             "light": "#e6ffb3",
-                            "dark": "pink"
+                            "dark": "green"
                         },
                         {
                             "light": "#b3b3ff",
-                            "dark": "lightgreen"
+                            "dark": "cyan"
                         },
                         {
                             "light": "#ffd9b3",
@@ -99,11 +99,11 @@
                         },
                         {
                             "light": "#ffff80",
-                            "dark": "green"
+                            "dark": "lightgreen"
                         },
                         {
                             "light": "#d1e0e0",
-                            "dark": "red"
+                            "dark": "pink"
                         }
                     ]
                 },
