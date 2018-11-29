@@ -1,6 +1,15 @@
 'use strict';
-import { commands, ExtensionContext, window, OverviewRulerLane, workspace, Range, QuickPickItem, ThemableDecorationRenderOptions } from 'vscode';
-import fs = require('file-system')
+import {
+    commands,
+    ExtensionContext,
+    window,
+    OverviewRulerLane,
+    workspace,
+    Range,
+    QuickPickItem,
+    ThemableDecorationRenderOptions
+} from 'vscode';
+import fs = require('fs')
 
 export function activate(context: ExtensionContext) {
     interface Highlightable {
@@ -8,7 +17,7 @@ export function activate(context: ExtensionContext) {
         wholeWord: boolean
         ignoreCase: boolean
     }
-
+    let highlightedPath = workspace.rootPath;
     let words: Highlightable[] = []
     let decorators = []
     enum Modes {
@@ -16,11 +25,13 @@ export function activate(context: ExtensionContext) {
         WholeWord,
         IgnoreCase,
         Both
-    }    
+    }
     let mode = 0
-
+    updateDecorations(); // highlights with previous values
     commands.registerCommand('highlightwords.addRegExpHighlight', function () {
-        window.showInputBox({ prompt: 'Enter expression' })
+        window.showInputBox({
+                prompt: 'Enter expression'
+            })
             .then(word => {
                 try {
                     let opts = ''
@@ -44,42 +55,43 @@ export function activate(context: ExtensionContext) {
                 }
             });
     });
-
-    commands.registerCommand('highlightwords.addHighlightDifficult', function(){
-        //TODO: write this part
-        addLine(1)
-        addLine(10)
+    commands.registerCommand('highlightwords.loadHighlighted', function () {
+        // add existing words from file, concat unique objects (https://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items) and https://stackoverflow.com/questions/18083389/ignore-typescript-errors-property-does-not-exist-on-value-of-type https://stackoverflow.com/questions/32238602/javascript-remove-duplicates-of-objects-sharing-same-property-value
+        // highlighted.json file is in EACH project /.vscode folder (workspace settings)
+        if (fs.existsSync(`${highlightedPath}/.vscode/highlighted.json`)){
+        words = [...new Set([...JSON.parse(fs.readFileSync(`${highlightedPath}/.vscode/highlighted.json`, 'utf8')), ...words])];
+        removeDuplicatesBy(x => x.expression, words);
+        //console.log('words fin addSelected: '+JSON.stringify(allwords)+" - "+JSON.stringify(words));
+        // = allwords;        
+        addSelected();
+        }else{
+            window.showInformationMessage('No highlighted.json file, nothing to highlight!')
+        }
     })
 
-    function addLine(line: number) {
-        const editor = window.activeTextEditor;
-        let l = editor.document.lineAt(line)
-        let word = editor.document.getText(l.range);
-        if(!word) {
-            const range = editor.document.getWordRangeAtPosition(editor.selection.start)
-            if(range) word = editor.document.getText(range)
-        }
-        if (!word) {
-            window.showInformationMessage('Nothing selected!')
-            return;
-        }
-        word = word.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") // raw selected text, not regexp
-        const highlights = words.filter(w => w.expression == word) // avoid duplicates
-        if (!highlights || !highlights.length) {
-            const ww = mode == Modes.WholeWord || mode == Modes.Both
-            const ic = mode == Modes.IgnoreCase || mode == Modes.Both
-            
-            words.push({ expression: word, wholeWord: ww, ignoreCase: ic });
-            updateDecorations()
-        }
+    function removeDuplicatesBy(keyFn, array) {
+        var mySet = new Set();
+        return array.filter(function (x) {
+            var key = keyFn(x),
+                isNew = !mySet.has(key);
+            if (isNew) mySet.add(key);
+            return isNew;
+        });
+    }
+    function saveHighlighted(){
+        // save words to file at each addition
+        const buffer = new Buffer(JSON.stringify(words), 'utf8');
+        fs.writeFile(`${highlightedPath}/.vscode/highlighted.json`, buffer, err => {
+            if (err) return console.error(err);
+        });
     }
 
-    function addSelected(withOptions?: boolean) {
+    function addSelected(withOptions ? : boolean) {
         const editor = window.activeTextEditor;
         let word = editor.document.getText(editor.selection);
-        if(!word) {
+        if (!word) {
             const range = editor.document.getWordRangeAtPosition(editor.selection.start)
-            if(range) word = editor.document.getText(range)
+            if (range) word = editor.document.getText(range)
         }
         if (!word) {
             window.showInformationMessage('Nothing selected!')
@@ -99,15 +111,19 @@ export function activate(context: ExtensionContext) {
                     });
                     updateDecorations()
                 })
-            }
-            else {
+            } else {
                 const ww = mode == Modes.WholeWord || mode == Modes.Both
                 const ic = mode == Modes.IgnoreCase || mode == Modes.Both
-                
-                words.push({ expression: word, wholeWord: ww, ignoreCase: ic });
+
+                words.push({
+                    expression: word,
+                    wholeWord: ww,
+                    ignoreCase: ic
+                });
                 updateDecorations()
             }
         }
+        saveHighlighted();
     }
 
     commands.registerCommand('highlightwords.addHighlight', function () {
@@ -119,13 +135,17 @@ export function activate(context: ExtensionContext) {
     });
 
     commands.registerCommand('highlightwords.removeHighlight', function () {
-        window.showQuickPick(words.concat([{ expression: '* All *', wholeWord: false, ignoreCase: false }]).map(w => {
-            return {
-                label: w.expression,
-                description: (w.ignoreCase ? 'i' : '') + (w.wholeWord ? 'w' : ''),
-                detail: ''
-            }
-        }))
+        window.showQuickPick(words.concat([{
+                expression: '* All *',
+                wholeWord: false,
+                ignoreCase: false
+            }]).map(w => {
+                return {
+                    label: w.expression,
+                    description: (w.ignoreCase ? 'i' : '') + (w.wholeWord ? 'w' : ''),
+                    detail: ''
+                }
+            }))
             .then(word => {
                 if (!word) return;
                 if (word.label == '* All *') words = []
@@ -137,66 +157,68 @@ export function activate(context: ExtensionContext) {
                 }
                 updateDecorations();
             })
+        saveHighlighted();
     });
 
     commands.registerCommand('highlightwords.removeAllHighlights', function () {
         words = []
         updateDecorations();
+        saveHighlighted();
     });
 
     commands.registerCommand('highlightwords.setHighlightMode', function () {
-        const modes = ['Default', 'Whole Word', 'Ignore Case', 'Both'].map((s, i) => mode == i ? s+' ✅' : s)
+        const modes = ['Default', 'Whole Word', 'Ignore Case', 'Both'].map((s, i) => mode == i ? s + ' ✅' : s)
         window.showQuickPick(modes).then(option => {
             if (typeof option == 'undefined') return;
 
             mode = modes.indexOf(option)
         })
     })
-    
+
     interface HighlightColors {
         light: string
-        dark: string
+        pen: string
     }
 
     interface BoxOptions {
         light: boolean,
-        dark: boolean
+            dark: boolean
     }
 
     function getConfigValues() {
         let config = workspace.getConfiguration('highlightwords')
-        let colors: HighlightColors[] = <HighlightColors[]>config.get('colors');
-        const defaultMode = <number>config.get('defaultMode')
-        if(typeof defaultMode != 'undefined') mode = defaultMode
-    
+        let colors: HighlightColors[] = < HighlightColors[] > config.get('colors');
+        const defaultMode = < number > config.get('defaultMode')
+        if (typeof defaultMode != 'undefined') mode = defaultMode
+
         decorators = [];
         colors.forEach(function (color) {
             var dark: ThemableDecorationRenderOptions = {
                 // this color will be used in dark color themes
                 overviewRulerColor: 'red',
-                backgroundColor: color.dark, //config.get<BoxOptions>('box').dark ? 'inherit' : color.dark,
-                borderColor: color.dark,
-                color: 'black'
+                backgroundColor: color.light, //config.get<BoxOptions>('box').dark ? 'inherit' : color.dark,
+                //borderColor: color.dark,
+                color: color.pen
             }
-            if(!config.get<BoxOptions>('box').dark) 
+            if (!config.get < BoxOptions > ('box').dark)
                 dark.color = '#555555'
             let decorationType = window.createTextEditorDecorationType({
-                borderWidth: '2px',
-                borderStyle: 'solid',
+                // borderWidth: '2px',
+                // borderStyle: 'solid',
                 overviewRulerLane: OverviewRulerLane.Right,
                 light: {
                     // this color will be used in light color themes
                     overviewRulerColor: 'red',
-                    borderColor: color.light,
+                    //borderColor: color.light,
                     backgroundColor: color.light, //config.get<BoxOptions>('box').light ? 'inherit' : color.light
-                    color: 'black'
+                    color: color.pen
                 },
                 dark: dark
             });
             decorators.push(decorationType);
         });
-    
-        return decorators;  
+
+        return decorators;
     }
 
     decorators = getConfigValues()
@@ -223,6 +245,7 @@ export function activate(context: ExtensionContext) {
     }, null, context.subscriptions);
 
     var timeout: NodeJS.Timer = null;
+
     function triggerUpdateDecorations() {
         if (timeout) {
             clearTimeout(timeout);
@@ -234,7 +257,7 @@ export function activate(context: ExtensionContext) {
         updateDecorations(true)
     }
 
-    function updateDecorations(active?) {
+    function updateDecorations(active ? ) {
         window.visibleTextEditors.forEach(editor => {
             if (active && editor.document != window.activeTextEditor.document) return;
             const text = editor.document.getText();
@@ -244,6 +267,7 @@ export function activate(context: ExtensionContext) {
                 let dec = [];
                 decs.push(dec);
             });
+
             words.forEach(function (w, n) {
                 const opts = w.ignoreCase ? 'gi' : 'g'
                 const expression = w.wholeWord ? '\\b' + w.expression + '\\b' : w.expression
@@ -251,7 +275,9 @@ export function activate(context: ExtensionContext) {
                 while (match = regEx.exec(text)) {
                     const startPos = editor.document.positionAt(match.index);
                     const endPos = editor.document.positionAt(match.index + match[0].length);
-                    const decoration = { range: new Range(startPos, endPos) };
+                    const decoration = {
+                        range: new Range(startPos, endPos)
+                    };
                     decs[n % decs.length].push(decoration);
                 }
             });
@@ -260,10 +286,9 @@ export function activate(context: ExtensionContext) {
             });
 
         })
-
+        return
     }
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-}
+export function deactivate() {}

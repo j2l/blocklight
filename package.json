@@ -22,6 +22,7 @@
         "onCommand:highlightwords.addHighlightWithOptions",
         "onCommand:highlightwords.removeAllHighlights",
         "onCommand:highlightwords.setHighlightMode",
+        "onCommand:highlightwords.loadHighlighted",
         "onCommand:highlightwords.addHighlightDifficult"
     ],
     "main": "./out/src/extension",
@@ -42,7 +43,9 @@
         "commands": [
             {
                 "command": "highlightwords.addHighlight",
-                "title": "Highlight Current"
+                "title": "Highlight Current",
+                "key": "ctrl+alt+c",
+                "mac": "cmd+alt+c"
             },
             {
                 "command": "highlightwords.removeHighlight",
@@ -50,11 +53,15 @@
             },
             {
                 "command": "highlightwords.removeAllHighlights",
-                "title": "Highlight Remove All"
+                "title": "Highlight Remove All",
+                "key": "ctrl+alt+d",
+                "mac": "cmd+alt+d"
             },
             {
                 "command": "highlightwords.addRegExpHighlight",
-                "title": "Highlight Regex"
+                "title": "Highlight Regex",
+                "key": "ctrl+alt+r",
+                "mac": "cmd+alt+r"
             },
             {
                 "command": "highlightwords.addHighlightWithOptions",
@@ -65,8 +72,10 @@
                 "title": "Set Highlight Mode"
             },
             {
-                "command": "highlightwords.addHighlightDifficult",
-                "title": "Highlight Difficult Lines"
+                "command": "highlightwords.loadHighlighted",
+                "title": "Highlight from .vscode/highlighted.json file",
+                "key": "ctrl+alt+o",
+                "mac": "cmd+alt+o"
             }
         ],
         "configuration": {
@@ -74,36 +83,52 @@
                 "highlightwords.colors": {
                     "default": [
                         {
-                            "light": "#b3d9ff",
-                            "dark": "red"
+                            "light": "#2C589C",
+                            "pen": "white"
                         },
                         {
-                            "light": "#e6ffb3",
-                            "dark": "green"
+                            "light": "#c411ff",
+                            "pen": "white"
                         },
                         {
-                            "light": "#b3b3ff",
-                            "dark": "cyan"
+                            "light": "#068587",
+                            "pen": "white"
                         },
                         {
-                            "light": "#ffd9b3",
-                            "dark": "magenta"
+                            "light": "#5FB97D",
+                            "pen": "black"
                         },
                         {
-                            "light": "#ffb3ff",
-                            "dark": "cornflowerblue"
+                            "light": "#FFD137",
+                            "pen": "black"
                         },
                         {
-                            "light": "#b3ffb3",
-                            "dark": "orange"
+                            "light": "#ED553B",
+                            "pen": "white"
                         },
                         {
-                            "light": "#ffff80",
-                            "dark": "lightgreen"
+                            "light": "#97ff28",
+                            "pen": "black"
                         },
                         {
-                            "light": "#d1e0e0",
-                            "dark": "pink"
+                            "light": "#ff2897",
+                            "pen": "white"
+                        },
+                        {
+                            "light": "#28fff4",
+                            "pen": "black"
+                        },
+                        {
+                            "light": "#6da3ff",
+                            "pen": "white"
+                        },
+                        {
+                            "light": "#fff06d",
+                            "pen": "black"
+                        },
+                        {
+                            "light": "#ff6d88",
+                            "pen": "black"
                         }
                     ]
                 },
