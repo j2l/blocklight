@@ -29,7 +29,7 @@ A highlighting tool was a first step, but it needed a set of rules to transform 
 * Click on the squarish logo on the left (Extensions) or CTRL+SHIFT+X and search for blocklight, click once on it
 * In the blocklight page, click on the "Install" button then on "reload" button to restart VS Code with this extension
 * Open a project folder or a simple file and select some word (double click)
-* If folder doesn't have a .vscode/ folder, you need to create it from VSCode (Windows Explore can't create folders starting with a dot)
+* If folder doesn't have a `.vscode` folder, you need to create it from VSCode (Windows Explore can't create folders starting with a dot)
 * You can add words by chosing "Highlight Current" from the command pallet (CTRL+SHIFT+P) or simply CTRL+ALT+C, this will highlight the word at the cursor or the selection and all other words in all open files.
 * To stop highlighting, choose "Highlight Remove", then the desired word or expression, or all
 * You may also remove all from the command "Highlight Remove All" (CTRL+ALT+D) without the prompt for selection
